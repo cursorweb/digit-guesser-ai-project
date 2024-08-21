@@ -16,6 +16,10 @@ test_data = datasets.MNIST(
     download=True,
 )
 
+test_loader = DataLoader(test_data, shuffle=True, batch_size=6 * 5)
+
+examples = enumerate(test_loader)
+_, (imgs, labels) = next(examples)
 
 model = NeuralNetwork().to(DEVICE)
 model.load_state_dict(torch.load("model.pth"))
@@ -26,11 +30,12 @@ import matplotlib.pyplot as plt
 
 fig = plt.figure()
 with torch.no_grad():
-    for i in range(6):
-        plt.subplot(2, 3, i + 1)
+    for i in range(6 * 5):
+        plt.subplot(5, 6, i + 1)
         plt.tight_layout()
 
-        img, label = test_data[i]
+        img = imgs[i]
+        label = labels[i]
 
         plt.imshow(img.squeeze(), cmap="gray", interpolation="none")
 

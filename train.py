@@ -8,7 +8,7 @@ from neuralnet import NeuralNetwork
 
 TRAIN_BATCH_SIZE = 32
 TEST_BATCH_SIZE = 100
-EPOCHS = 5
+EPOCHS = 7
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"  # no mac
 print(f"Training using {DEVICE} device")
 
@@ -44,6 +44,8 @@ model = NeuralNetwork().to(DEVICE)
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters())
 
+loss_data = []
+
 
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
@@ -63,6 +65,7 @@ def train(dataloader, model, loss_fn, optimizer):
 
         if batch % 100 == 0:
             loss, current = loss.item(), (batch + 1) * len(img)
+            loss_data.append(loss)
             print(
                 f"\nloss: {loss:>7f}, [{current:>5d}/{size:>5d} ({current/size * 100:.2f}%)]",
                 end="",
@@ -96,3 +99,9 @@ for epoch in range(EPOCHS):
     test(test_loader, model, loss_fn)
 
     torch.save(model.state_dict(), "./model.pth")
+
+import matplotlib.pyplot as plt
+
+fig = plt.figure()
+plt.plot(range(len(loss_data)), loss_data)
+plt.show()

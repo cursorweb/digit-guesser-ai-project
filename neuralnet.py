@@ -20,6 +20,5 @@ class NeuralNetwork(nn.Module):
 
     def forward(self, x):
         x = self.flatten(x)
-        print(x.shape)
         logits = self.relu_stack(x)
         return logits  # log_softmax?
