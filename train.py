@@ -40,11 +40,14 @@ test_loader = DataLoader(
 
 
 model = NeuralNetwork().to(DEVICE)
+# model.load_state_dict(torch.load("model.pth", weights_only=True))
+
 
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters())
 
 loss_data = []
+acc_data = []
 
 
 def train(dataloader, model, loss_fn, optimizer):
@@ -88,6 +91,7 @@ def test(dataloader, model, loss_fn):
 
     test_loss /= num_batches  # take average
     correct /= size
+    acc_data.append(correct)
     print(
         f"\nTest set:\n\tAccuracy: {100 * correct:>.2f}%, Avg. Loss: {test_loss:>8f}\n"
     )
@@ -104,4 +108,5 @@ import matplotlib.pyplot as plt
 
 fig = plt.figure()
 plt.plot(range(len(loss_data)), loss_data)
+plt.plot(range(len(acc_data)), acc_data)
 plt.show()

@@ -1,4 +1,5 @@
 from torch import nn
+from torch.nn.functional import log_softmax
 
 
 # test loader = [ 100 x ( [ batch_size x [ 1x28x28 image ] ], [ batch_size x label ] ) ]
@@ -15,10 +16,12 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
+            nn.Linear(512, 512),
+            nn.ReLU(),
             nn.Linear(512, 10),
         )
 
     def forward(self, x):
         x = self.flatten(x)
         logits = self.relu_stack(x)
-        return logits  # log_softmax?
+        return log_softmax(logits)

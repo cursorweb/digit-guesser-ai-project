@@ -8,6 +8,9 @@ from neuralnet import NeuralNetwork
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"  # no mac
 print(f"Loaded {DEVICE} device")
 
+ROWS = 4
+COLS = 4
+
 
 test_data = datasets.MNIST(
     "./data/",
@@ -22,7 +25,7 @@ examples = enumerate(test_loader)
 _, (imgs, labels) = next(examples)
 
 model = NeuralNetwork().to(DEVICE)
-model.load_state_dict(torch.load("model.pth"))
+model.load_state_dict(torch.load("model.pth", weights_only=True))
 
 model.eval()
 
@@ -30,8 +33,8 @@ import matplotlib.pyplot as plt
 
 fig = plt.figure()
 with torch.no_grad():
-    for i in range(6 * 5):
-        plt.subplot(5, 6, i + 1)
+    for i in range(ROWS * ROWS):
+        plt.subplot(ROWS, ROWS, i + 1)
         plt.tight_layout()
 
         img = imgs[i]
@@ -42,10 +45,13 @@ with torch.no_grad():
         img = img.to(DEVICE)
         pred = model(img)
 
-        guess = pred.argmax(1)[0]
+        certainty, guess = pred.exp().max(1)
+        certainty, guess = certainty.item(), guess.item()
+        # certainty = 0  # pred.exp().max(1)[0]
+        # guess = pred.argmax(1)[0]
         actual = label
 
-        plt.title(f"Guess: {guess}\n Actual: {actual}")
+        plt.title(f"Guess: {guess} ({certainty * 100:.2f})\n Actual: {actual}")
         plt.xticks([])
         plt.yticks([])
 
