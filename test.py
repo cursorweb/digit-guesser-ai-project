@@ -1,7 +1,6 @@
 import torch
 
 from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
 
 from neuralnet import NeuralNetwork
 
@@ -12,12 +11,7 @@ ROWS = 4
 COLS = 4
 
 
-test_data = datasets.MNIST(
-    "./data/",
-    train=False,
-    transform=transforms.ToTensor(),
-    download=True,
-)
+test_data = torch.load("./test_set.pt", weights_only=False)
 
 test_loader = DataLoader(test_data, shuffle=True, batch_size=6 * 5)
 

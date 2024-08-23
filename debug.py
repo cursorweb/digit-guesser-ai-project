@@ -1,5 +1,8 @@
-import torch
 import numpy as np
+
+from torchvision import transforms
+
+import torch
 
 from neuralnet import NeuralNetwork
 
@@ -17,14 +20,16 @@ img = plt.imread("number2.png")
 
 
 def rgb2gray(rgb):
-    return np.round(1 - np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140]), 1)
+    return np.round(1 - np.mean(rgb, -1), decimals=1)
 
 
 img = rgb2gray(img)
+print(img)
 
-img = np.expand_dims(img, axis=0)
 
-img = torch.as_tensor(img).to(torch.float32)
+transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(0.5, 0.5)])
+
+img = transform(img)
 
 with torch.no_grad():
     img = img.to(DEVICE)

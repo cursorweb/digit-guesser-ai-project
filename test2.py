@@ -1,7 +1,6 @@
 import torch
 
 from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
 
 from neuralnet import NeuralNetwork
 
@@ -9,12 +8,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"  # no mac
 print(f"Loaded {DEVICE} device")
 
 
-test_data = datasets.MNIST(
-    "./data/",
-    train=False,
-    transform=transforms.ToTensor(),
-    download=True,
-)
+test_data = torch.load("./test_set.pt", weights_only=False)
 
 test_loader = DataLoader(test_data, shuffle=True, batch_size=6 * 5)
 

@@ -12,12 +12,13 @@ class NeuralNetwork(nn.Module):
         super().__init__()
         self.flatten = nn.Flatten()  # converts to 32, 28^2
         self.relu_stack = nn.Sequential(
-            nn.Linear(28 * 28, 512),  # 512 is a constant
+            nn.Linear(28 * 28, 256),  # 512 is a constant
             nn.ReLU(),
-            nn.Linear(512, 784),
+            nn.Linear(256, 512),
             nn.ReLU(),
-            nn.Linear(784, 256),
+            nn.Linear(512, 256),
             nn.ReLU(),
+            nn.Dropout(),
             nn.Linear(256, 10),
         )
 
