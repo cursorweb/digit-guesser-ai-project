@@ -18,7 +18,6 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 256),
             nn.ReLU(),
-            nn.Dropout(),
             nn.Linear(256, 10),
         )
 

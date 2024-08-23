@@ -8,7 +8,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"  # no mac
 print(f"Loaded {DEVICE} device")
 
 
-test_data = torch.load("./test_set.pt", weights_only=False)
+test_data = torch.load("./data/test_set.pt", weights_only=False)
 
 test_loader = DataLoader(test_data, shuffle=True, batch_size=6 * 5)
 

@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data.dataset import Subset
 
-test_data: Subset = torch.load("./test_set.pt", weights_only=False)
+test_data: Subset = torch.load("./data/test_set.pt", weights_only=False)
 
 x = test_data
 img = x.dataset[0][0]

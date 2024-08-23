@@ -11,7 +11,7 @@ ROWS = 4
 COLS = 4
 
 
-test_data = torch.load("./test_set.pt", weights_only=False)
+test_data = torch.load("./data/test_set.pt", weights_only=False)
 
 test_loader = DataLoader(test_data, shuffle=True, batch_size=6 * 5)
 
