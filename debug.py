@@ -13,12 +13,11 @@ model.eval()
 
 import matplotlib.pyplot as plt
 
-img = plt.imread("number.png")
-print(img.shape)
+img = plt.imread("number2.png")
 
 
 def rgb2gray(rgb):
-    return 1 - np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
+    return np.round(1 - np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140]), 1)
 
 
 img = rgb2gray(img)

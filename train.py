@@ -44,7 +44,7 @@ model = NeuralNetwork().to(DEVICE)
 
 
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters())
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
 loss_data = []
 acc_data = []

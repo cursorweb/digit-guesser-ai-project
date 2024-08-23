@@ -14,8 +14,11 @@ model.eval()
 
 
 pygame.init()
+pygame.font.init()
 screen = pygame.display.set_mode((640, 640))
 pygame.display.set_caption("Number Recognizer")
+
+font = pygame.font.Font(size=64)
 
 clock = pygame.time.Clock()
 running = True
@@ -26,15 +29,21 @@ mouse_pressed = False
 
 save_canvas = pygame.surface.Surface((28, 28))
 
+predicted_text = None
+
 
 def rgb2gray(rgb) -> np.ndarray:
-    return 1 - np.mean(rgb, -1) / 255  # np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
+    return np.round(
+        1 - np.mean(rgb, -1) / 255, decimals=1
+    )  # np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
 
 
 def image_to_arr():
     pygame.transform.smoothscale(
         screen.convert_alpha(), (28, 28), dest_surface=save_canvas
     )
+
+    pygame.image.save(save_canvas, "number2.png")
 
     img = pygame.surfarray.pixels3d(save_canvas)
     img = rgb2gray(img)  # convert to 28x28
@@ -48,7 +57,8 @@ def image_to_arr():
 
         certainty, guess = pred.exp().max(1)
         certainty, guess = certainty.item(), guess.item()
-        print("guess:", guess, "certainty:", certainty)
+        return f"{certainty * 100:.2f}% {guess}"
+        # print("guess:", guess, "certainty:", certainty)
 
 
 while running:
@@ -59,10 +69,12 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # LEFT
                 mouse_pressed = True
+                predicted_text = None
             if event.button == 3:  # RIGHT
                 points = []
+                predicted_text = None
             if event.button == 2:  # MIDDLE
-                image_to_arr()
+                predicted_text = image_to_arr()
 
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
@@ -75,7 +87,11 @@ while running:
     screen.fill("white")
 
     for point in points:
-        pygame.draw.circle(screen, (0, 0, 0), point, 50)
+        pygame.draw.circle(screen, (0, 0, 0), point, 30)
+
+    if predicted_text:
+        predict_font = font.render(predicted_text, True, (15, 15, 255))
+        screen.blit(predict_font, (10, 10))
 
     pygame.display.flip()
 
