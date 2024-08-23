@@ -14,14 +14,14 @@ class NeuralNetwork(nn.Module):
         self.relu_stack = nn.Sequential(
             nn.Linear(28 * 28, 512),  # 512 is a constant
             nn.ReLU(),
-            nn.Linear(512, 512),
+            nn.Linear(512, 784),
             nn.ReLU(),
-            nn.Linear(512, 512),
+            nn.Linear(784, 256),
             nn.ReLU(),
-            nn.Linear(512, 10),
+            nn.Linear(256, 10),
         )
 
     def forward(self, x):
         x = self.flatten(x)
         logits = self.relu_stack(x)
-        return log_softmax(logits)
+        return log_softmax(logits, dim=-1)

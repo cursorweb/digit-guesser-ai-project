@@ -6,9 +6,9 @@ from torchvision import datasets, transforms
 
 from neuralnet import NeuralNetwork
 
-TRAIN_BATCH_SIZE = 32
+TRAIN_BATCH_SIZE = 64
 TEST_BATCH_SIZE = 100
-EPOCHS = 7
+EPOCHS = 16
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"  # no mac
 print(f"Training using {DEVICE} device")
 
