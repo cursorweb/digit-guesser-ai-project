@@ -16,7 +16,10 @@ model.eval()
 
 pygame.init()
 pygame.font.init()
-screen = pygame.display.set_mode((640, 640))
+
+WID, HEI = 640, 640
+
+screen = pygame.display.set_mode((WID, HEI))
 pygame.display.set_caption("Number Recognizer")
 
 font = pygame.font.Font(size=64)
@@ -41,8 +44,6 @@ def rgb2gray(rgb) -> np.ndarray:
 
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(0.5, 0.5)])
 
-# import matplotlib.pyplot as plt
-
 
 def image_to_arr():
     pygame.transform.smoothscale(
@@ -55,7 +56,6 @@ def image_to_arr():
     img = np.rot90(img)
     img = transform(img.copy()).to(torch.float32)  # 1x28x28
 
-    # img = torch.as_tensor(img.copy()).to(torch.float32)
     with torch.no_grad():
         img = img.to(DEVICE)
         pred = model(img)
@@ -63,7 +63,6 @@ def image_to_arr():
         certainty, guess = pred.exp().max(1)
         certainty, guess = certainty.item(), guess.item()
         return f"{certainty * 100:.2f}% {guess}"
-        # print("guess:", guess, "certainty:", certainty)
 
 
 while running:
@@ -92,7 +91,21 @@ while running:
     screen.fill("white")
 
     for point in points:
-        pygame.draw.circle(screen, (0, 0, 0), point, 30)
+        pygame.draw.circle(screen, (0, 0, 0), point, 25)
+
+    if len(points) == 0:
+        predict_font = font.render("Left click to draw", True, (0, 0, 0))
+        screen.blit(
+            predict_font, (WID / 2 - predict_font.get_width() / 2, HEI / 2 - 50 - 32)
+        )
+        predict_font = font.render("Middle click to classify", True, (0, 0, 0))
+        screen.blit(
+            predict_font, (WID / 2 - predict_font.get_width() / 2, HEI / 2 - 32)
+        )
+        predict_font = font.render("Right click to clear", True, (0, 0, 0))
+        screen.blit(
+            predict_font, (WID / 2 - predict_font.get_width() / 2, HEI / 2 + 50 - 32)
+        )
 
     if predicted_text:
         predict_font = font.render(predicted_text, True, (15, 15, 255))

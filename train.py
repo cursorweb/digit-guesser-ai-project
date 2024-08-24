@@ -1,3 +1,6 @@
+RETRAIN = False  # Should retrain existing model?
+
+
 import torch
 from torch import nn
 
@@ -6,6 +9,9 @@ from torchvision import datasets, transforms
 
 from neuralnet import NeuralNetwork
 
+import os
+
+
 TRAIN_BATCH_SIZE = 64
 TEST_BATCH_SIZE = 100
 EPOCHS = 16
@@ -13,14 +19,23 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"  # no mac
 print(f"Training using {DEVICE} device")
 
 
-train_set = torch.load("./data/train_set.pt", weights_only=False)
-val_set = torch.load("./data/val_set.pt", weights_only=False)
-# transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(0.5, 0.5)])
-# dataset = datasets.MNIST(root="./data", transform=transform, download=True)
-# train_set, val_set, test_set = random_split(dataset, [50000, 10000 - 50, 50])
-# torch.save(train_set, "./data/train_set.pt")
-# torch.save(val_set, "./data/val_set.pt")
-# torch.save(test_set, "./data/test_set.pt")
+try:
+    train_set = torch.load("./data/train_set.pt", weights_only=False)
+    val_set = torch.load("./data/val_set.pt", weights_only=False)
+    print("Using ./data/train_set.pt")
+except:
+    if not os.path.isdir("./data"):
+        os.makedirs("./data")
+
+    transform = transforms.Compose(
+        [transforms.ToTensor(), transforms.Normalize(0.5, 0.5)]
+    )
+    dataset = datasets.MNIST(root="./data", transform=transform, download=True)
+    train_set, val_set, test_set = random_split(dataset, [50000, 10000 - 50, 50])
+    torch.save(train_set, "./data/train_set.pt")
+    torch.save(val_set, "./data/val_set.pt")
+    torch.save(test_set, "./data/test_set.pt")
+    print("Saved to ./data/train_set.pt")
 
 
 train_loader = DataLoader(
@@ -37,11 +52,17 @@ test_loader = DataLoader(
 
 
 model = NeuralNetwork().to(DEVICE)
-# model.load_state_dict(torch.load("model.pth", weights_only=True))
-
 
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+
+
+if RETRAIN:
+    model.load_state_dict(torch.load("model.pth", weights_only=True))
+    try:
+        optimizer.load_state_dict(torch.load("optimizer.pth", weights_only=True))
+    except:
+        pass
 
 loss_data = []
 acc_data = []
@@ -100,6 +121,7 @@ for epoch in range(EPOCHS):
     test(test_loader, model, loss_fn)
 
     torch.save(model.state_dict(), "./model.pth")
+    torch.save(optimizer.state_dict(), "./optimizer.pth")
 
 import matplotlib.pyplot as plt
 import numpy as np
