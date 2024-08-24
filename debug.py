@@ -16,11 +16,11 @@ model.eval()
 
 import matplotlib.pyplot as plt
 
-img = plt.imread("number2.png")
+img = plt.imread("number.png")
 
 
 def rgb2gray(rgb):
-    return np.round(1 - np.mean(rgb, -1), decimals=1)
+    return 1 - np.mean(rgb, -1)  # np.round(, decimals=1)
 
 
 img = rgb2gray(img)
@@ -30,6 +30,9 @@ print(img)
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(0.5, 0.5)])
 
 img = transform(img)
+
+
+np.savetxt("my-img.out", img.squeeze(), fmt="%.4f")
 
 with torch.no_grad():
     img = img.to(DEVICE)

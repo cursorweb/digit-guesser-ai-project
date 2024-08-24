@@ -1,6 +1,8 @@
+from PIL import Image
 import numpy as np
 
 from torchvision import transforms
+from torchvision.transforms import functional as TF
 
 import torch
 
@@ -16,31 +18,36 @@ model.eval()
 
 import matplotlib.pyplot as plt
 
-img = plt.imread("number.png")
-
 
 def rgb2gray(rgb):
-    return np.round(1 - np.mean(rgb, -1), decimals=1)
+    return np.clip(np.round(1 - np.mean(rgb, -1), decimals=1), -1, 0.984)
 
 
-img = rgb2gray(img)
+# img = TF.to_grayscale(img)
+
+# img = rgb2gray(img)
 
 
-transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(0.5, 0.5)])
+while 1:
+    img = plt.imread("number3.png")
+    transform = transforms.Compose(
+        [transforms.ToTensor(), transforms.Normalize(0.5, 0.5)]
+    )
 
-img = transform(img)
+    img = transform(img)
 
-with torch.no_grad():
-    img = img.to(DEVICE)
-    pred = model(img)
+    with torch.no_grad():
+        img = img.to(DEVICE)
+        pred = model(img)
 
-    certainty, guess = pred.exp().max(1)
-    certainty, guess = certainty.item(), guess.item()
-    print("guess:", guess, "certainty:", certainty)
+        certainty, guess = pred.exp().max(1)
+        certainty, guess = certainty.item(), guess.item()
+        print("guess:", guess, "certainty:", certainty)
+        input()
 
-    plt.imshow(img.cpu().squeeze(), cmap="gray")
-    plt.title(f"Guess: {guess} ({certainty * 100:.2f})")
-    plt.xticks([])
-    plt.yticks([])
+#     plt.imshow(img.cpu().squeeze(), cmap="gray")
+#     plt.title(f"Guess: {guess} ({certainty * 100:.2f})")
+#     plt.xticks([])
+#     plt.yticks([])
 
-plt.show()
+# plt.show()

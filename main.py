@@ -2,6 +2,7 @@ import pygame
 import numpy as np
 
 import torch
+from torchvision import transforms
 
 from neuralnet import NeuralNetwork
 
@@ -38,19 +39,23 @@ def rgb2gray(rgb) -> np.ndarray:
     )  # np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
 
 
+transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(0.5, 0.5)])
+
+# import matplotlib.pyplot as plt
+
+
 def image_to_arr():
     pygame.transform.smoothscale(
         screen.convert_alpha(), (28, 28), dest_surface=save_canvas
     )
 
-    pygame.image.save(save_canvas, "number2.png")
-
     img = pygame.surfarray.pixels3d(save_canvas)
     img = rgb2gray(img)  # convert to 28x28
+    img = np.flip(img, axis=-1)
     img = np.rot90(img)
-    img = np.expand_dims(img, axis=0)  # 1x28x28
+    img = transform(img.copy()).to(torch.float32)  # 1x28x28
 
-    img = torch.as_tensor(img.copy()).to(torch.float32)
+    # img = torch.as_tensor(img.copy()).to(torch.float32)
     with torch.no_grad():
         img = img.to(DEVICE)
         pred = model(img)
