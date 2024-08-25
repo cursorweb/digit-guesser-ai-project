@@ -1,5 +1,6 @@
+import torch
 from torch import nn
-from torch.nn.functional import log_softmax
+import torch.nn.functional as F
 
 
 # test loader = [ 100 x ( [ batch_size x [ 1x28x28 image ] ], [ batch_size x label ] ) ]
@@ -10,18 +11,17 @@ from torch.nn.functional import log_softmax
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
-        self.flatten = nn.Flatten()  # converts to 32, 28^2
-        self.relu_stack = nn.Sequential(
-            nn.Linear(28 * 28, 256),  # 512 is a constant
-            nn.ReLU(),
-            nn.Linear(256, 512),
-            nn.ReLU(),
-            nn.Linear(512, 256),
-            nn.ReLU(),
-            nn.Linear(256, 10),
-        )
+        self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
+        self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
+        self.conv2_drop = nn.Dropout1d()
+        self.fc1 = nn.Linear(320, 50)
+        self.fc2 = nn.Linear(50, 10)
 
     def forward(self, x):
-        x = self.flatten(x)
-        logits = self.relu_stack(x)
-        return log_softmax(logits, dim=-1)
+        x = F.relu(F.max_pool2d(self.conv1(x), 2))
+        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
+        x = x.view(-1, 320)
+        x = F.relu(self.fc1(x))
+        x = F.dropout(x, training=self.training)
+        x = self.fc2(x)
+        return F.log_softmax(x, dim=-1)

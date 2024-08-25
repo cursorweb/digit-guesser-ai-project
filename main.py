@@ -6,6 +6,10 @@ from torchvision import transforms
 
 from neuralnet import NeuralNetwork
 
+import re
+import os
+
+
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"  # no mac
 print(f"Loaded {DEVICE} device")
 
@@ -36,13 +40,26 @@ save_canvas = pygame.surface.Surface((28, 28))
 predicted_text = None
 
 
+import re
+
+
+def extract_number(f):
+    s = re.findall(r"img(\d+)-is", f)
+    return int(s[0]) if s else -1
+
+
+def get_highest():
+    list_of_files = os.listdir("./inputs")
+    return max(map(extract_number, list_of_files or ["file0.png"]))
+
+
+index = get_highest()
+
+
 def rgb2gray(rgb) -> np.ndarray:
     return np.round(
         1 - np.mean(rgb, -1) / 255, decimals=1
     )  # np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
-
-
-transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(0.5, 0.5)])
 
 
 def image_to_arr():
@@ -54,6 +71,14 @@ def image_to_arr():
     img = rgb2gray(img)  # convert to 28x28
     img = np.flip(img, axis=-1)
     img = np.rot90(img)
+
+    # mean = np.mean(img)
+    # std = np.std(img)
+
+    transform = transforms.Compose(
+        [transforms.ToTensor(), transforms.Normalize(0.1307, 0.3081)]
+    )
+
     img = transform(img.copy()).to(torch.float32)  # 1x28x28
 
     with torch.no_grad():
@@ -63,6 +88,21 @@ def image_to_arr():
         certainty, guess = pred.exp().max(1)
         certainty, guess = certainty.item(), guess.item()
         return f"{certainty * 100:.2f}% {guess}"
+
+
+def save_file(num):
+    global index
+    pygame.transform.smoothscale(
+        screen.convert_alpha(), (28, 28), dest_surface=save_canvas
+    )
+
+    img = pygame.surfarray.pixels3d(save_canvas)
+    img = rgb2gray(img)  # convert to 28x28
+    img = np.flip(img, axis=-1)
+    img = np.rot90(img)
+
+    index += 1
+    pygame.image.save(save_canvas, f"./inputs/img{index}-is{num}.png")
 
 
 while running:
@@ -79,6 +119,12 @@ while running:
                 predicted_text = None
             if event.button == 2:  # MIDDLE
                 predicted_text = image_to_arr()
+
+        if event.type == pygame.KEYDOWN:
+            if event.key >= pygame.K_0 and event.key <= pygame.K_9:
+                num = event.key - pygame.K_0
+                save_file(num)
+                points = []
 
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:

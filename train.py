@@ -1,4 +1,4 @@
-RETRAIN = False  # Should retrain existing model?
+RETRAIN = True  # Should retrain existing model?
 
 
 import torch
@@ -20,6 +20,7 @@ print(f"Training using {DEVICE} device")
 
 
 try:
+    raise Exception()
     train_set = torch.load("./data/train_set.pt", weights_only=False)
     val_set = torch.load("./data/val_set.pt", weights_only=False)
     print("Using ./data/train_set.pt")
@@ -28,13 +29,13 @@ except:
         os.makedirs("./data")
 
     transform = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize(0.5, 0.5)]
+        [transforms.ToTensor(), transforms.Normalize(0.1307, 0.3081)]
     )
     dataset = datasets.MNIST(root="./data", transform=transform, download=True)
     train_set, val_set, test_set = random_split(dataset, [50000, 10000 - 50, 50])
-    torch.save(train_set, "./data/train_set.pt")
-    torch.save(val_set, "./data/val_set.pt")
-    torch.save(test_set, "./data/test_set.pt")
+    # torch.save(train_set, "./data/train_set.pt")
+    # torch.save(val_set, "./data/val_set.pt")
+    # torch.save(test_set, "./data/test_set.pt")
     print("Saved to ./data/train_set.pt")
 
 
