@@ -13,3 +13,6 @@ Then, to run the program:
 ```py
 py main.py
 ```
+
+## Improved model
+View the improved CNN model on the [pytest](https://github.com/cursorweb/digit-guesser-ai-project/tree/pytest) brach.
