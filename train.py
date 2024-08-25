@@ -20,34 +20,21 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"  # no mac
 print(f"Training using {DEVICE} device")
 
 
-try:
-    raise Exception()
-    train_set = torch.load("./data/train_set.pt", weights_only=False)
-    val_set = torch.load("./data/val_set.pt", weights_only=False)
-    print("Using ./data/train_set.pt")
-except:
-    if not os.path.isdir("./data"):
-        os.makedirs("./data")
+transform = transforms.Compose(
+    [transforms.ToTensor(), transforms.Normalize(0.1307, 0.3081)]
+)
+dataset1 = datasets.MNIST(root="./data", transform=transform, download=True)
+dataset2 = CustomImageDataset(
+    annotations_file="./inputs/class.json",
+    img_dir="./inputs/data/",
+    transform=transform,
+)
 
-    transform = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize(0.1307, 0.3081)]
-    )
-    dataset1 = datasets.MNIST(root="./data", transform=transform, download=True)
-    dataset2 = CustomImageDataset(
-        annotations_file="./inputs/class.json",
-        img_dir="./inputs/data/",
-        transform=transform,
-    )
+dataset = ConcatDataset([dataset1, dataset2])
 
-    dataset = ConcatDataset([dataset1, dataset2])
+train_set, val_set = random_split(dataset, [50000 + len(dataset2), 10000])
 
-    train_set, val_set, test_set = random_split(
-        dataset, [50000 + len(dataset2), 10000 - 50, 50]
-    )
-    # torch.save(train_set, "./data/train_set.pt")
-    # torch.save(val_set, "./data/val_set.pt")
-    # torch.save(test_set, "./data/test_set.pt")
-    print("Saved to ./data/train_set.pt")
+print("Loaded datasets")
 
 
 train_loader = DataLoader(

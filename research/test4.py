@@ -1,10 +1,6 @@
-import torch
-from torch import nn
-
-from torch.utils.data import DataLoader, random_split, ConcatDataset
+from torch.utils.data import DataLoader, ConcatDataset
 from torchvision import datasets, transforms
 
-from neuralnet import NeuralNetwork
 from custom_dataset import CustomImageDataset
 
 

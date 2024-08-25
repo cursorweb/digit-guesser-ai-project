@@ -49,7 +49,7 @@ def extract_number(f):
 
 
 def get_highest():
-    list_of_files = os.listdir("./inputs")
+    list_of_files = os.listdir("./inputs/data")
     return max(map(extract_number, list_of_files or ["file0.png"]))
 
 
@@ -102,7 +102,7 @@ def save_file(num):
     img = np.rot90(img)
 
     index += 1
-    pygame.image.save(save_canvas, f"./inputs/img{index}-is{num}.png")
+    pygame.image.save(save_canvas, f"./inputs/data/img{index}-is{num}.png")
 
 
 while running:

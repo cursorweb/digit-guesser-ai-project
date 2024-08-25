@@ -13,7 +13,7 @@ def extract_two(fname):
     return s.group(1), s.group(2)
 
 
-for file in os.listdir("./inputs"):
+for file in os.listdir("./inputs/data"):
     x = extract_two(file)
     if x == None:
         continue
@@ -21,7 +21,7 @@ for file in os.listdir("./inputs"):
     imnum, clss = x
     classified[f"{imnum}.png"] = clss
 
-    os.rename(f"./inputs/{file}", f"./inputs/{imnum}.png")
+    os.rename(f"./inputs/data/{file}", f"./inputs/data/{imnum}.png")
 
 with open("./inputs/class.json", "w") as f:
     json.dump(classified, f)
