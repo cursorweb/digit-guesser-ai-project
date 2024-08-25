@@ -1,3 +1,7 @@
+"""
+Different ways to try to try and load custom input images
+"""
+
 import numpy as np
 
 from torchvision import transforms

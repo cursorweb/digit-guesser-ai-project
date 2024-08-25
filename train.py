@@ -10,8 +10,6 @@ from torchvision import datasets, transforms
 from neuralnet import NeuralNetwork
 from custom_dataset import CustomImageDataset
 
-import os
-
 
 TRAIN_BATCH_SIZE = 64
 TEST_BATCH_SIZE = 100

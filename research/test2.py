@@ -1,3 +1,7 @@
+"""
+Test a single image. Refer to test.py for running
+"""
+
 import torch
 
 from torch.utils.data import DataLoader

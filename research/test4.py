@@ -1,3 +1,7 @@
+"""
+Try various ways to import custom images
+"""
+
 from torch.utils.data import DataLoader, ConcatDataset
 from torchvision import datasets, transforms
 

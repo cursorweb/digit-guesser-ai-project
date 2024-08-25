@@ -1,3 +1,7 @@
+"""
+Test out the model on a test set (currently broken until you can provide a test_set.pt)
+"""
+
 import torch
 
 from torch.utils.data import DataLoader

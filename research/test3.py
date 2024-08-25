@@ -1,3 +1,7 @@
+"""
+Try various ways to load image and inspect pixel data
+"""
+
 import torch
 from torch.utils.data.dataset import Subset
 
