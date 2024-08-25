@@ -8,10 +8,9 @@ with open("./inputs/class.json") as f:
 
 def extract_two(fname):
     s = re.match(r"img(\d+)-is(\d+)", fname)
-    print(s, fname)
     if not s:
         return
-    # return s
+    return s.group(1), s.group(2)
 
 
 for file in os.listdir("./inputs"):
@@ -23,3 +22,6 @@ for file in os.listdir("./inputs"):
     classified[f"{imnum}.png"] = clss
 
     os.rename(f"./inputs/{file}", f"./inputs/{imnum}.png")
+
+with open("./inputs/class.json", "w") as f:
+    json.dump(classified, f)

@@ -6,6 +6,9 @@ import torch
 
 from neuralnet import NeuralNetwork
 
+import json
+
+
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"  # no mac
 print(f"Loaded {DEVICE} device")
 
@@ -19,59 +22,79 @@ COLS = 6
 
 import matplotlib.pyplot as plt
 
-img = plt.imread("number.png")
-
 
 def rgb2gray(rgb):
     return 1 - np.mean(rgb, -1)
 
 
-img = rgb2gray(img)
-print(img)
-
-
-transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(0.5, 0.5)])
-
-img = transform(img)
+with open("./inputs/class.json") as f:
+    classified = json.load(f)
 
 
 plt.figure()
+plt.suptitle("MNIST normalization")
 with torch.no_grad():
     for i in range(ROWS * COLS):
         plt.subplot(ROWS, COLS, i + 1)
         plt.tight_layout()
 
-        img = imgs[i]
-        label = labels[i]
+        fname = f"{i + 1}.png"
+        img = plt.imread(f"./inputs/{fname}")
+        img = rgb2gray(img)
+
+        transform = transforms.Compose(
+            [transforms.ToTensor(), transforms.Normalize(0.1307, 0.3081)]
+        )
+
+        img = transform(img)
+        label = classified[fname]
 
         plt.imshow(img.squeeze(), cmap="gray", interpolation="none")
 
         img = img.to(DEVICE)
         pred = model(img)
 
-        certainty, guess = pred.exp().max(1)
-        certainty, guess = certainty.item(), guess.item()
-        # certainty = 0  # pred.exp().max(1)[0]
-        # guess = pred.argmax(1)[0]
+        _, guess = pred.exp().max(1)
+        guess = guess.item()
         actual = label
 
-        plt.title(f"Guess: {guess} ({certainty * 100:.2f})\n Actual: {actual}")
+        plt.title(f"Guess: {guess}\n Actual: {actual}")
         plt.xticks([])
         plt.yticks([])
 
-plt.show()
 
+plt.figure()
+plt.suptitle("Custom normalization")
 with torch.no_grad():
-    img = img.to(DEVICE)
-    pred = model(img)
+    for i in range(ROWS * COLS):
+        plt.subplot(ROWS, COLS, i + 1)
+        plt.tight_layout()
 
-    certainty, guess = pred.exp().max(1)
-    certainty, guess = certainty.item(), guess.item()
-    print("guess:", guess, "certainty:", certainty)
+        fname = f"{i + 1}.png"
+        img = plt.imread(f"./inputs/{fname}")
+        img = rgb2gray(img)
 
-    plt.imshow(img.cpu().squeeze(), cmap="gray")
-    plt.title(f"Guess: {guess} ({certainty * 100:.2f})")
-    plt.xticks([])
-    plt.yticks([])
+        mean = np.mean(img)
+        std = np.std(img)
+
+        transform = transforms.Compose(
+            [transforms.ToTensor(), transforms.Normalize(mean, std)]
+        )
+
+        img = transform(img)
+        label = classified[fname]
+
+        plt.imshow(img.squeeze(), cmap="gray", interpolation="none")
+
+        img = img.to(DEVICE)
+        pred = model(img)
+
+        _, guess = pred.exp().max(1)
+        guess = guess.item()
+        actual = label
+
+        plt.title(f"Guess: {guess}\n Actual: {actual}")
+        plt.xticks([])
+        plt.yticks([])
 
 plt.show()

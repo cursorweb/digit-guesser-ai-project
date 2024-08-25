@@ -44,7 +44,7 @@ import re
 
 
 def extract_number(f):
-    s = re.findall(r"img(\d+)-is", f)
+    s = re.findall(r"(?:img)?(\d+)(?:-is\d+)?\.png$", f)
     return int(s[0]) if s else -1
 
 
