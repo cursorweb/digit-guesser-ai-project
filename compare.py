@@ -13,7 +13,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"  # no mac
 print(f"Loaded {DEVICE} device")
 
 model = NeuralNetwork().to(DEVICE)
-model.load_state_dict(torch.load("model.pth", weights_only=True))
+model.load_state_dict(torch.load("model2.pth", weights_only=True))
 
 model.eval()
 
@@ -31,6 +31,8 @@ with open("./inputs/class.json") as f:
     classified = json.load(f)
 
 
+acc_mnist = 0
+
 plt.figure()
 plt.suptitle("MNIST normalization")
 with torch.no_grad():
@@ -39,7 +41,7 @@ with torch.no_grad():
         plt.tight_layout()
 
         fname = f"{i + 1}.png"
-        img = plt.imread(f"./inputs/{fname}")
+        img = plt.imread(f"./inputs/data/{fname}")
         img = rgb2gray(img)
 
         transform = transforms.Compose(
@@ -58,10 +60,14 @@ with torch.no_grad():
         guess = guess.item()
         actual = label
 
+        if str(guess) == actual:
+            acc_mnist += 1
+
         plt.title(f"Guess: {guess}\n Actual: {actual}")
         plt.xticks([])
         plt.yticks([])
 
+acc_custom = 0
 
 plt.figure()
 plt.suptitle("Custom normalization")
@@ -71,7 +77,7 @@ with torch.no_grad():
         plt.tight_layout()
 
         fname = f"{i + 1}.png"
-        img = plt.imread(f"./inputs/{fname}")
+        img = plt.imread(f"./inputs/data/{fname}")
         img = rgb2gray(img)
 
         mean = np.mean(img)
@@ -93,8 +99,14 @@ with torch.no_grad():
         guess = guess.item()
         actual = label
 
+        if str(guess) == actual:
+            acc_custom += 1
+
         plt.title(f"Guess: {guess}\n Actual: {actual}")
         plt.xticks([])
         plt.yticks([])
 
 plt.show()
+
+total = ROWS * COLS
+print("mnist:", acc_mnist / (total), "custom:", acc_custom / total)

@@ -4,10 +4,11 @@ RETRAIN = True  # Should retrain existing model?
 import torch
 from torch import nn
 
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, random_split, ConcatDataset
 from torchvision import datasets, transforms
 
 from neuralnet import NeuralNetwork
+from custom_dataset import CustomImageDataset
 
 import os
 
@@ -31,8 +32,18 @@ except:
     transform = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize(0.1307, 0.3081)]
     )
-    dataset = datasets.MNIST(root="./data", transform=transform, download=True)
-    train_set, val_set, test_set = random_split(dataset, [50000, 10000 - 50, 50])
+    dataset1 = datasets.MNIST(root="./data", transform=transform, download=True)
+    dataset2 = CustomImageDataset(
+        annotations_file="./inputs/class.json",
+        img_dir="./inputs/data/",
+        transform=transform,
+    )
+
+    dataset = ConcatDataset([dataset1, dataset2])
+
+    train_set, val_set, test_set = random_split(
+        dataset, [50000 + len(dataset2), 10000 - 50, 50]
+    )
     # torch.save(train_set, "./data/train_set.pt")
     # torch.save(val_set, "./data/val_set.pt")
     # torch.save(test_set, "./data/test_set.pt")
